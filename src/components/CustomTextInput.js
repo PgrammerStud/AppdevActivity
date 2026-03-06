@@ -15,13 +15,7 @@ const CustomTextInput = ({
       <TextInput
         placeholder={placeholder}
         onChangeText={value}
-        style={[
-          textStyle,
-          {
-            width: '80%',
-            borderBottomWidth: 1,
-          },
-        ]}
+        style={[textStyle, { flex: 1 }]}  // ← flex:1 instead of fixed width
       />
     </View>
   );
