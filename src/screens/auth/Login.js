@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import {
   Alert,
   KeyboardAvoidingView,
@@ -8,13 +8,15 @@ import {
   Text,
   TouchableOpacity,
   View,
-  Animated,
+  ActivityIndicator,
 } from 'react-native';
 
+import { useDispatch, useSelector } from 'react-redux';
 import { useNavigation } from '@react-navigation/native';
 import CustomButton from '../../components/CustomButton';
 import CustomTextInput from '../../components/CustomTextInput';
 import { ROUTES } from '../../utils';
+import { userLogin, resetLogin } from '../../app/reducers/auth';
 
 // ─── Brand Palette ───────────────────────────────────────────────
 const AMBER        = '#dd8928';
@@ -41,6 +43,33 @@ const Login = () => {
   const [passFocused, setPassFocused]   = useState(false);
 
   const navigation = useNavigation();
+  const dispatch = useDispatch();
+  const { isLoading = false, isError = false, errorMessage = null, isLoggedIn = false } = useSelector(state => state.auth || {});
+
+  useEffect(() => {
+    if (isLoggedIn) {
+      Alert.alert('Success', 'Login successful!');
+      dispatch(resetLogin());
+      navigation.reset({
+        index: 0,
+        routes: [{ name: ROUTES.HOME }],
+      });
+    }
+  }, [isLoggedIn, dispatch, navigation]);
+
+  useEffect(() => {
+    if (isError && errorMessage) {
+      Alert.alert('Login Failed', errorMessage);
+    }
+  }, [isError, errorMessage]);
+
+  const handleLogin = () => {
+    if (!emailAdd || !password) {
+      Alert.alert('Oops!', 'Please enter your email and password.');
+      return;
+    }
+    dispatch(userLogin({ email: emailAdd, password }));
+  };
 
   return (
     <KeyboardAvoidingView
@@ -107,7 +136,8 @@ const Login = () => {
               <Text style={s.inputIcon}>✉</Text>
               <CustomTextInput
                 placeholder="you@example.com"
-                value={val => setEmailAdd(val)}
+                value={emailAdd}
+                onChangeText={setEmailAdd}
                 keyboardType="email-address"
                 containerStyle={s.inputInner}
                 textStyle={s.inputText}
@@ -123,7 +153,8 @@ const Login = () => {
               <Text style={s.inputIcon}>🔒</Text>
               <CustomTextInput
                 placeholder="Your password"
-                value={val => setPassword(val)}
+                value={password}
+                onChangeText={setPassword}
                 secureTextEntry
                 containerStyle={s.inputInner}
                 textStyle={s.inputText}
@@ -140,19 +171,20 @@ const Login = () => {
 
           {/* ── Login CTA ── */}
           <TouchableOpacity
-            style={s.loginBtn}
+            style={[s.loginBtn, isLoading && s.loginBtnDisabled]}
             activeOpacity={0.85}
-            onPress={() => {
-              if (!emailAdd || !password) {
-                Alert.alert('Oops!', 'Please enter your email and password.');
-                return;
-              }
-              // TODO: authenticate
-            }}
+            onPress={handleLogin}
+            disabled={isLoading}
           >
-            <View style={s.loginBtnSheen} />
-            <Text style={s.loginBtnText}>Sign In</Text>
-            <Text style={s.loginBtnArrow}>→</Text>
+            {isLoading ? (
+              <ActivityIndicator size="small" color={WHITE} />
+            ) : (
+              <>
+                <View style={s.loginBtnSheen} />
+                <Text style={s.loginBtnText}>Sign In</Text>
+                <Text style={s.loginBtnArrow}>→</Text>
+              </>
+            )}
           </TouchableOpacity>
 
           {/* ── Divider ── */}
@@ -387,12 +419,13 @@ const s = StyleSheet.create({
     borderWidth: 0,
     paddingHorizontal: 0,
     paddingVertical: 0,
+    height: 48,
   },
   inputText: {
     fontFamily: 'OpenSans-Regular',
     fontSize: 14,
     color: BROWN,
-
+    paddingVertical: 12,
   },
 
   // Forgot
@@ -425,6 +458,9 @@ const s = StyleSheet.create({
     elevation: 8,
     overflow: 'hidden',
     position: 'relative',
+  },
+  loginBtnDisabled: {
+    opacity: 0.7,
   },
   loginBtnSheen: {
     position: 'absolute',

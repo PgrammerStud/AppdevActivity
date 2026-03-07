@@ -1,13 +1,14 @@
 import { NavigationContainer } from '@react-navigation/native';
 import { useEffect } from 'react';
 import { Platform, StatusBar, useColorScheme } from 'react-native';
+import { useSelector } from 'react-redux';
 
 import AuthNav from './AuthNav';
 import MainNav from './MainNav';
 
 export default () => {
   const isDarkMode = useColorScheme() === 'dark';
-  const isLoggedIn = false;
+  const { isLoggedIn = false } = useSelector(state => state.auth || {});
 
   useEffect(() => {
     if (Platform.OS === 'android') {

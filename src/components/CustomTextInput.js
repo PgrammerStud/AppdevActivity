@@ -8,14 +8,25 @@ const CustomTextInput = ({
   value,
   containerStyle,
   textStyle,
+  onChangeText,
+  secureTextEntry,
+  keyboardType,
+  onFocus,
+  onBlur,
 }) => {
   return (
     <View style={containerStyle}>
-      <Text style={labelStyle}>{label}</Text>
+      {label && <Text style={labelStyle}>{label}</Text>}
       <TextInput
         placeholder={placeholder}
-        onChangeText={value}
-        style={[textStyle, { flex: 1 }]}  // ← flex:1 instead of fixed width
+        value={value}
+        onChangeText={onChangeText}
+        secureTextEntry={secureTextEntry}
+        keyboardType={keyboardType}
+        onFocus={onFocus}
+        onBlur={onBlur}
+        style={[textStyle]}
+        placeholderTextColor="#999"
       />
     </View>
   );

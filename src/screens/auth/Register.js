@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import {
   Alert,
   KeyboardAvoidingView,
@@ -8,12 +8,15 @@ import {
   Text,
   TouchableOpacity,
   View,
+  ActivityIndicator,
 } from 'react-native';
 
+import { useDispatch, useSelector } from 'react-redux';
 import { useNavigation } from '@react-navigation/native';
 import CustomButton from '../../components/CustomButton';
 import CustomTextInput from '../../components/CustomTextInput';
 import { ROUTES } from '../../utils';
+import { userRegister, resetRegister } from '../../app/reducers/auth';
 
 // ─── Brand Palette ───────────────────────────────────────────────
 const AMBER        = '#dd8928';
@@ -49,7 +52,26 @@ const Register = () => {
   const [focused, setFocused] = useState(null);
 
   const navigation = useNavigation();
+  const dispatch = useDispatch();
   const strength   = getStrength(password);
+  const { isLoading = false, isError = false, errorMessage = null, isLoggedIn = false } = useSelector(state => state.auth || {});
+
+  useEffect(() => {
+    if (isLoggedIn) {
+      Alert.alert('Success', 'Registration successful! You are now logged in.');
+      dispatch(resetRegister());
+      navigation.reset({
+        index: 0,
+        routes: [{ name: ROUTES.HOME }],
+      });
+    }
+  }, [isLoggedIn, dispatch, navigation]);
+
+  useEffect(() => {
+    if (isError && errorMessage) {
+      Alert.alert('Registration Failed', errorMessage);
+    }
+  }, [isError, errorMessage]);
 
   const handleRegister = () => {
     if (!firstName || !lastName || !emailAdd || !password || !confirmPassword) {
@@ -64,7 +86,14 @@ const Register = () => {
       Alert.alert('Terms Required', 'Please agree to the Terms and Privacy Policy.');
       return;
     }
-    // TODO: registration logic
+    
+    // Dispatch register action
+    dispatch(userRegister({
+      firstName,
+      lastName,
+      email: emailAdd,
+      password,
+    }));
   };
 
   const shell = (name) => [s.inputShell, focused === name && s.inputShellFocused];
@@ -152,7 +181,8 @@ const Register = () => {
               <View style={shell('fname')}>
                 <CustomTextInput
                   placeholder="Juan"
-                  value={val => setFirstName(val)}
+                  value={firstName}
+                  onChangeText={setFirstName}
                   containerStyle={s.inputInner}
                   textStyle={s.inputText}
                   onFocus={() => setFocused('fname')}
@@ -166,7 +196,8 @@ const Register = () => {
               <View style={shell('lname')}>
                 <CustomTextInput
                   placeholder="Dela Cruz"
-                  value={val => setLastName(val)}
+                  value={lastName}
+                  onChangeText={setLastName}
                   containerStyle={s.inputInner}
                   textStyle={s.inputText}
                   onFocus={() => setFocused('lname')}
@@ -183,7 +214,8 @@ const Register = () => {
               <Text style={s.inputIcon}>✉</Text>
               <CustomTextInput
                 placeholder="you@example.com"
-                value={val => setEmailAdd(val)}
+                value={emailAdd}
+                onChangeText={setEmailAdd}
                 keyboardType="email-address"
                 containerStyle={s.inputInner}
                 textStyle={s.inputText}
@@ -200,7 +232,8 @@ const Register = () => {
               <Text style={s.inputIcon}>🔒</Text>
               <CustomTextInput
                 placeholder="Create a strong password"
-                value={val => setPassword(val)}
+                value={password}
+                onChangeText={setPassword}
                 secureTextEntry
                 containerStyle={s.inputInner}
                 textStyle={s.inputText}
@@ -236,7 +269,8 @@ const Register = () => {
               <Text style={s.inputIcon}>🔒</Text>
               <CustomTextInput
                 placeholder="Repeat your password"
-                value={val => setConfirmPassword(val)}
+                value={confirmPassword}
+                onChangeText={setConfirmPassword}
                 secureTextEntry
                 containerStyle={s.inputInner}
                 textStyle={s.inputText}
@@ -274,13 +308,20 @@ const Register = () => {
 
           {/* ── Register CTA ── */}
           <TouchableOpacity
-            style={s.registerBtn}
+            style={[s.registerBtn, isLoading && s.registerBtnDisabled]}
             activeOpacity={0.85}
             onPress={handleRegister}
+            disabled={isLoading}
           >
-            <View style={s.registerBtnSheen} />
-            <Text style={s.registerBtnText}>Create Account</Text>
-            <Text style={s.registerBtnArrow}>→</Text>
+            {isLoading ? (
+              <ActivityIndicator size="small" color={WHITE} />
+            ) : (
+              <>
+                <View style={s.registerBtnSheen} />
+                <Text style={s.registerBtnText}>Create Account</Text>
+                <Text style={s.registerBtnArrow}>→</Text>
+              </>
+            )}
           </TouchableOpacity>
 
           {/* ── Footer ── */}
@@ -636,6 +677,9 @@ const s = StyleSheet.create({
     elevation: 8,
     overflow: 'hidden',
     position: 'relative',
+  },
+  registerBtnDisabled: {
+    opacity: 0.7,
   },
   registerBtnSheen: {
     position: 'absolute',

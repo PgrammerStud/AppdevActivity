@@ -4,12 +4,20 @@ import {
   USER_LOGIN_ERROR,
   USER_LOGIN_REQUEST,
   USER_LOGIN_RESET,
-} from '../actions';
+  USER_REGISTER,
+  USER_REGISTER_COMPLETED,
+  USER_REGISTER_ERROR,
+  USER_REGISTER_REQUEST,
+  USER_REGISTER_RESET,
+  USER_LOGOUT,
+} from '../action';
 
 const INITIAL_STATE = {
   data: null,
   isLoading: false,
   isError: false,
+  errorMessage: null,
+  isLoggedIn: false,
 };
 
 export default function reducer(state = INITIAL_STATE, action) {
@@ -21,6 +29,7 @@ export default function reducer(state = INITIAL_STATE, action) {
         data: null,
         isLoading: true,
         isError: false,
+        errorMessage: null,
       };
 
     case USER_LOGIN_COMPLETED:
@@ -29,16 +38,56 @@ export default function reducer(state = INITIAL_STATE, action) {
         data: action.payload,
         isLoading: false,
         isError: false,
+        isLoggedIn: true,
+        errorMessage: null,
       };
 
     case USER_LOGIN_ERROR:
       return {
+        ...state,
         data: null,
         isLoading: false,
         isError: true,
+        isLoggedIn: false,
+        errorMessage: action.payload,
       };
 
     case USER_LOGIN_RESET:
+      return INITIAL_STATE;
+
+    case USER_REGISTER_REQUEST:
+      return {
+        ...state,
+        data: null,
+        isLoading: true,
+        isError: false,
+        errorMessage: null,
+      };
+
+    case USER_REGISTER_COMPLETED:
+      return {
+        ...state,
+        data: action.payload,
+        isLoading: false,
+        isError: false,
+        isLoggedIn: true,
+        errorMessage: null,
+      };
+
+    case USER_REGISTER_ERROR:
+      return {
+        ...state,
+        data: null,
+        isLoading: false,
+        isError: true,
+        isLoggedIn: false,
+        errorMessage: action.payload,
+      };
+
+    case USER_REGISTER_RESET:
+      return INITIAL_STATE;
+
+    case USER_LOGOUT:
       return INITIAL_STATE;
 
     default:
@@ -51,7 +100,19 @@ export const userLogin = payload => ({
   payload,
 });
 
+export const userRegister = payload => ({
+  type: USER_REGISTER,
+  payload,
+});
 
 export const resetLogin = () => ({
-  type: USER_LOGIN_RESET
+  type: USER_LOGIN_RESET,
+});
+
+export const resetRegister = () => ({
+  type: USER_REGISTER_RESET,
+});
+
+export const userLogout = () => ({
+  type: USER_LOGOUT,
 });
