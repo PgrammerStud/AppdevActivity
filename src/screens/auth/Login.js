@@ -37,8 +37,10 @@ const WHITE        = '#ffffff';
 // Body:            OpenSans-Regular / OpenSans-SemiBold
 
 const Login = () => {
+  const [username, setUsername]     = useState('');
   const [emailAdd, setEmailAdd]     = useState('');
   const [password, setPassword]     = useState('');
+  const [usernameFocused, setUsernameFocused] = useState(false);
   const [emailFocused, setEmailFocused] = useState(false);
   const [passFocused, setPassFocused]   = useState(false);
 
@@ -64,11 +66,11 @@ const Login = () => {
   }, [isError, errorMessage]);
 
   const handleLogin = () => {
-    if (!emailAdd || !password) {
-      Alert.alert('Oops!', 'Please enter your email and password.');
+    if (!username || !emailAdd || !password) {
+      Alert.alert('Oops!', 'Please enter your username, email and password.');
       return;
     }
-    dispatch(userLogin({ email: emailAdd, password }));
+    dispatch(userLogin({ username, email: emailAdd, password }));
   };
 
   return (
@@ -130,6 +132,22 @@ const Login = () => {
           <Text style={s.subheading}>Sign in to place your order</Text>
 
           {/* ── Inputs ── */}
+          <View style={s.fieldWrap}>
+            <Text style={s.label}>Username</Text>
+            <View style={[s.inputShell, usernameFocused && s.inputShellFocused]}>
+              <Text style={s.inputIcon}>👤</Text>
+              <CustomTextInput
+                placeholder="your username"
+                value={username}
+                onChangeText={setUsername}
+                containerStyle={s.inputInner}
+                textStyle={s.inputText}
+                onFocus={() => setUsernameFocused(true)}
+                onBlur={() => setUsernameFocused(false)}
+              />
+            </View>
+          </View>
+
           <View style={s.fieldWrap}>
             <Text style={s.label}>Email Address</Text>
             <View style={[s.inputShell, emailFocused && s.inputShellFocused]}>
