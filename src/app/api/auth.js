@@ -1,4 +1,4 @@
-const BASE_URL = 'http://192.168.1.148:8000/api';
+const BASE_URL = 'http://192.168.43.43:8000/api';
 const options = {
   headers: {
     Accept: 'application/json',
@@ -6,13 +6,12 @@ const options = {
   },
 };
 
-export async function authLogin({ username, email, password }) {
+export async function authLogin({ username, password }) {
   const response = await fetch(BASE_URL + '/login', {
     method: 'POST',
     ...options,
     body: JSON.stringify({
       username,
-      email,
       password,
     }),
   });
@@ -32,12 +31,14 @@ export async function authLogin({ username, email, password }) {
   }
 }
 
-export async function authRegister({ firstName, lastName, email, password }) {
+export async function authRegister({ lastname, firstname, username, email, password }) {
   const response = await fetch(BASE_URL + '/register', {
     method: 'POST',
     ...options,
     body: JSON.stringify({
-      name: `${firstName} ${lastName}`,
+      lastname,
+      firstname,
+      username,
       email,
       password,
     }),
