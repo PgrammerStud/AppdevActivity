@@ -38,10 +38,10 @@ const WHITE        = '#ffffff';
 
 const Login = () => {
   const [username, setUsername]     = useState('');
-  const [emailAdd, setEmailAdd]     = useState('');
+  // const [emailAdd, setEmailAdd]     = useState('');
   const [password, setPassword]     = useState('');
   const [usernameFocused, setUsernameFocused] = useState(false);
-  const [emailFocused, setEmailFocused] = useState(false);
+  // const [emailFocused, setEmailFocused] = useState(false);
   const [passFocused, setPassFocused]   = useState(false);
 
   const navigation = useNavigation();
@@ -66,11 +66,11 @@ const Login = () => {
   }, [isError, errorMessage]);
 
   const handleLogin = () => {
-    if (!username || !emailAdd || !password) {
-      Alert.alert('Oops!', 'Please enter your username, email and password.');
+    if (!username || !password) {
+      Alert.alert('Oops!', 'Please enter your username and password.');
       return;
     }
-    dispatch(userLogin({ username, email: emailAdd, password }));
+    dispatch(userLogin({ username, password }));
   };
 
   return (
@@ -148,7 +148,7 @@ const Login = () => {
             </View>
           </View>
 
-          <View style={s.fieldWrap}>
+          {/* <View style={s.fieldWrap}>
             <Text style={s.label}>Email Address</Text>
             <View style={[s.inputShell, emailFocused && s.inputShellFocused]}>
               <Text style={s.inputIcon}>✉</Text>
@@ -163,7 +163,7 @@ const Login = () => {
                 onBlur={() => setEmailFocused(false)}
               />
             </View>
-          </View>
+          </View> */}
 
           <View style={s.fieldWrap}>
             <Text style={s.label}>Password</Text>

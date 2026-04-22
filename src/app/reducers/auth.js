@@ -18,6 +18,7 @@ const INITIAL_STATE = {
   isError: false,
   errorMessage: null,
   isLoggedIn: false,
+  isRegistered: false,
 };
 
 export default function reducer(state = INITIAL_STATE, action) {
@@ -70,7 +71,7 @@ export default function reducer(state = INITIAL_STATE, action) {
         data: action.payload,
         isLoading: false,
         isError: false,
-        isLoggedIn: true,
+        isRegistered: true,
         errorMessage: null,
       };
 
@@ -80,7 +81,7 @@ export default function reducer(state = INITIAL_STATE, action) {
         data: null,
         isLoading: false,
         isError: true,
-        isLoggedIn: false,
+        isRegistered: false,
         errorMessage: action.payload,
       };
 

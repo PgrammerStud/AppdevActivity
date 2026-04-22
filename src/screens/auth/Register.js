@@ -13,7 +13,7 @@ import {
 
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigation } from '@react-navigation/native';
-import CustomButton from '../../components/CustomButton';
+// import CustomButton from '../../components/CustomButton';
 import CustomTextInput from '../../components/CustomTextInput';
 import { ROUTES } from '../../utils';
 import { userRegister, resetRegister } from '../../app/reducers/auth';
@@ -44,6 +44,7 @@ const getStrength = (pass) => {
 const Register = () => {
   const [firstName, setFirstName]             = useState('');
   const [lastName, setLastName]               = useState('');
+  const [username, setUsername]               = useState('');
   const [emailAdd, setEmailAdd]               = useState('');
   const [password, setPassword]               = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
@@ -54,18 +55,18 @@ const Register = () => {
   const navigation = useNavigation();
   const dispatch = useDispatch();
   const strength   = getStrength(password);
-  const { isLoading = false, isError = false, errorMessage = null, isLoggedIn = false } = useSelector(state => state.auth || {});
+  const { isLoading = false, isError = false, errorMessage = null, isRegistered = false } = useSelector(state => state.auth || {});
 
   useEffect(() => {
-    if (isLoggedIn) {
-      Alert.alert('Success', 'Registration successful! You are now logged in.');
+    if (isRegistered) {
+      Alert.alert('Success', 'Registration successful!.Verify your email to log in.');
       dispatch(resetRegister());
       navigation.reset({
         index: 0,
-        routes: [{ name: ROUTES.HOME }],
+        routes: [{ name: ROUTES.LOGIN }],
       });
     }
-  }, [isLoggedIn, dispatch, navigation]);
+  }, [isRegistered, dispatch, navigation]);
 
   useEffect(() => {
     if (isError && errorMessage) {
@@ -74,7 +75,7 @@ const Register = () => {
   }, [isError, errorMessage]);
 
   const handleRegister = () => {
-    if (!firstName || !lastName || !emailAdd || !password || !confirmPassword) {
+    if (!firstName ||!lastName || !username || !emailAdd || !password || !confirmPassword) {
       Alert.alert('Incomplete', 'Please fill in all fields.');
       return;
     }
@@ -89,8 +90,9 @@ const Register = () => {
     
     // Dispatch register action
     dispatch(userRegister({
-      firstName,
-      lastName,
+      lastname: lastName,
+      firstname: firstName,
+      username,
       email: emailAdd,
       password,
     }));
@@ -190,6 +192,7 @@ const Register = () => {
                 />
               </View>
             </View>
+
             <View style={{ width: 10 }} />
             <View style={[s.fieldWrap, { flex: 1 }]}>
               <Text style={s.label}>Last Name</Text>
@@ -207,6 +210,23 @@ const Register = () => {
             </View>
           </View>
 
+        <View style={s.fieldWrap}>
+            <Text style={s.label}>Username</Text>
+            <View style={shell('username')}>
+              <Text style={s.inputIcon}>👤</Text>
+              <CustomTextInput
+                placeholder="juandelacruz"
+                value={username}
+                onChangeText={setUsername}
+                // keyboardType="username"
+                containerStyle={s.inputInner}
+                textStyle={s.inputText}
+                onFocus={() => setFocused('username')}
+                onBlur={() => setFocused(null)}
+              />
+            </View>
+          </View>
+        
           {/* Email */}
           <View style={s.fieldWrap}>
             <Text style={s.label}>Email Address</Text>
